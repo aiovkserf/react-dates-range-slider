@@ -1,5 +1,5 @@
-import DateRangeSlider from "./components/DateRangeSlider/DateRangeSlider.tsx";
 import moment from "moment";
+import DateRangeSlider from "./components/DateRangeSlider";
 
 function App() {
     return (

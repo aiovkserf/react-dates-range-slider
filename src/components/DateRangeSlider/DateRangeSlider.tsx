@@ -1,14 +1,9 @@
-import moment, { MomentInput } from "moment";
+import moment from "moment";
 import Slider from "rc-slider";
 import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
 import { MarkObj } from "rc-slider/es/Marks";
-import { Mode } from "./utils.ts";
-
-type DateRangeSliderProps = {
-    min: MomentInput;
-    max: MomentInput;
-};
+import { DateRangeSliderProps, Mode } from "./typings.ts";
 
 function DateRangeSlider(props: DateRangeSliderProps) {
     const minDate = moment(props.min).month(0),
@@ -91,6 +86,10 @@ function DateRangeSlider(props: DateRangeSliderProps) {
 
     return (
         <>
+            <h2>
+                {selectedRange.start.format("MMMM YYYY")}{" "}
+                {selectedRange.end.format("MMMM YYYY")}
+            </h2>
             <div className={"DateRangeSlider"} style={{ margin: "20px 0" }}>
                 <div className={"DateRangeSliderMode"}>
                     <span
