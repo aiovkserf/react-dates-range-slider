@@ -1,55 +1,77 @@
 import moment from "moment";
 import Slider from "rc-slider";
-import * as React from "react";
-import { useCallback, useEffect, useState } from "react";
+import Tooltip from "rc-tooltip";
+import { ReactNode, Ref, useEffect, useState } from "react";
 import { MarkObj } from "rc-slider/es/Marks";
 import { DateRangeSliderProps, Mode } from "./typings.ts";
+import styles from "./DateRangeSlider.module.scss";
+import { HandlesProps } from "rc-slider/lib/Handles";
+import Handle from "rc-slider/es/Handles/Handle";
 
-function DateRangeSlider(props: DateRangeSliderProps) {
+function DateRangeSlider(
+    props: DateRangeSliderProps,
+    ref: Ref<HTMLDivElement>,
+) {
     const minDate = moment(props.min).month(0),
-        maxDate = moment(props.max).month(1);
+        maxDate = moment(props.max).month(0),
+        yearsLength = maxDate.year() - minDate.year();
 
     const [mode, setMode] = useState(Mode.YEARS);
     const [min] = useState(0);
-    const [max, setMax] = useState(0);
+    const [max, setMax] = useState(yearsLength);
+    const [marks, setMarks] = useState({});
 
-    const getMarks = useCallback((): Record<
-        number,
-        React.ReactNode | MarkObj
-    > => {
-        const marks: Record<number, React.ReactNode | MarkObj> = {};
+    const updateMarks = () => {
+        const marks: Record<number, ReactNode | MarkObj> = {};
 
-        if (mode === Mode.YEARS) {
-            for (let i = 0; i < max + 1; i++) {
-                marks[i] = minDate.clone().add(i, "y").year();
+        const currentDate = minDate.clone();
+        const endDate = maxDate.clone().add(1, "month");
+        let i = 0;
+
+        while (currentDate.isBefore(endDate)) {
+            if (mode === Mode.YEARS) {
+                marks[i] = {
+                    label: (
+                        <span className={styles.Year}>
+                            {minDate.clone().add(i, "y").year()}
+                        </span>
+                    ),
+                };
+                currentDate.add(1, "y");
+                i++;
+                continue;
             }
-        } else {
-            const currentDate = minDate.clone();
-            const endDate = maxDate.clone();
-            let i = 0;
 
-            while (currentDate.isBefore(endDate)) {
+            if (yearsLength < 5) {
                 if (currentDate.month() === 0) {
-                    marks[i] = currentDate.year();
+                    marks[i] = {
+                        label: (
+                            <span className={styles.Year}>
+                                {currentDate.year()}
+                            </span>
+                        ),
+                    };
                     currentDate.add(1, "month");
                     i++;
                     continue;
                 }
 
-                marks[i] = currentDate.format("MMMM");
+                marks[i] = {
+                    label: (
+                        <span className={styles.Month}>
+                            {currentDate.format("MMM").replace(".", "")}
+                        </span>
+                    ),
+                };
                 i++;
                 currentDate.add(1, "month");
             }
         }
 
-        return marks;
-    }, [max, maxDate, minDate, mode]);
+        setMarks(marks);
+    };
 
-    const [marks, setMarks] = useState(getMarks());
-
-    const recalcMax = () => {
-        const yearsLength = maxDate.year() - minDate.year();
-
+    const recalculateMax = () => {
         if (mode == Mode.YEARS) {
             setMax(yearsLength);
             return;
@@ -58,7 +80,12 @@ function DateRangeSlider(props: DateRangeSliderProps) {
         setMax(yearsLength * 12);
     };
 
-    const [selectedRange, setSelectedRange] = useState({
+    useEffect(() => {
+        recalculateMax();
+        updateMarks();
+    }, [mode]);
+
+    const [, setSelectedRange] = useState({
         start: minDate,
         end: maxDate,
     });
@@ -79,40 +106,80 @@ function DateRangeSlider(props: DateRangeSliderProps) {
         setMode(mode);
     };
 
-    useEffect(() => {
-        recalcMax();
-        setMarks(getMarks());
-    }, [mode, recalcMax, setMarks, getMarks]);
+    const customTooltip: HandlesProps["handleRender"] = (
+        _origin,
+        { value, dragging, index, ...restProps },
+    ) => (
+        <Tooltip
+            overlay={`${minDate
+                .clone()
+                .add(value, mode === Mode.YEARS ? "y" : "month")
+                .format("MMMM YYYY")}`}
+            visible={dragging || true}
+            overlayInnerStyle={{
+                color: "#1A76BD",
+                backgroundColor: "white",
+                boxShadow: "0 5px 10px 0 rgba(91,176,240,0.53)",
+            }}
+            placement={"top"}
+            key={value + index}
+            showArrow={{ className: styles.TooltipArrow }}
+            destroyTooltipOnHide>
+            <Handle
+                valueIndex={0}
+                dragging={false}
+                onStartMove={() => {}}
+                onOffsetChange={() => {}}
+                value={value}
+                {...restProps}
+            />
+        </Tooltip>
+    );
 
     return (
         <>
-            <h2>
-                {selectedRange.start.format("MMMM YYYY")}{" "}
-                {selectedRange.end.format("MMMM YYYY")}
-            </h2>
-            <div className={"DateRangeSlider"} style={{ margin: "20px 0" }}>
-                <div className={"DateRangeSliderMode"}>
+            <div className={styles.DateRangeSlider} ref={ref}>
+                <div className={styles.DateRangeSliderMode}>
                     <span
-                        className={"DateRangeSliderModeOption"}
+                        className={
+                            styles.DateRangeSliderModeOption +
+                            " " +
+                            (mode === Mode.YEARS ? styles.Active : "")
+                        }
                         onClick={() => handleChangeMode(Mode.YEARS)}>
                         Все года
                     </span>
                     <span
-                        className={"DateRangeSliderModeOption"}
+                        className={
+                            styles.DateRangeSliderModeOption +
+                            " " +
+                            (mode === Mode.YEARS_AND_MONTHS
+                                ? styles.Active
+                                : "")
+                        }
                         onClick={() => handleChangeMode(Mode.YEARS_AND_MONTHS)}>
                         Месяца
                     </span>
                 </div>
                 <Slider
+                    className={styles.Slider}
                     min={min}
                     max={max}
-                    defaultValue={[min, max]}
                     step={1}
-                    range
                     marks={marks}
-                    allowCross={false}
-                    pushable={1}
+                    handleRender={customTooltip}
                     onChange={handleChangeRange}
+                    dotStyle={{
+                        display: "none",
+                    }}
+                    classNames={{
+                        track: styles.Track,
+                        handle: styles.Handle,
+                    }}
+                    range
+                    allowCross={false}
+                    draggableTrack={false}
+                    pushable={1}
                 />
             </div>
         </>

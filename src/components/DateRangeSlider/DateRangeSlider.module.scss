@@ -1,0 +1,101 @@
+.TooltipArrow {
+  border-top-color: white !important;
+  bottom: 5px !important;
+}
+
+.DateRangeSlider {
+  margin: 20px 0;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+
+  .DateRangeSliderMode {
+    display: flex;
+    flex-direction: column;
+
+    .DateRangeSliderModeOption {
+      white-space: nowrap;
+      font-size: .86em;
+      color: #80B3D4;
+      margin: 4px 0;
+      cursor: pointer;
+      width: fit-content;
+
+      &:after {
+        content: '';
+        margin-top: .1em;
+        display: block;
+        width: 100%;
+        height: .12em;
+        background-color: #E5EBF1;
+      }
+
+      &.Active {
+        color: #1A76BD;
+
+        &:after {
+          opacity: 0;
+        }
+      }
+    }
+  }
+
+  .Slider {
+    margin-left: 6em;
+
+    .Track {
+      background-color: #6AB4F2;
+    }
+
+    .Handle {
+      opacity: 100;
+      width: 20px;
+      height: 20px;
+      margin-top: -7px;
+      border: 2px solid #6AB4F2;
+    }
+
+    .Year,
+    .Month {
+      font-size: 1em;
+      color: #9A9A9A;
+      user-select: none;
+      top: 20px;
+    }
+
+    &:has(.Month) {
+      .Year {
+        color: #2D2D2D;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1440px) {
+  .DateRangeSlider {
+    flex-direction: column;
+    padding: 0;
+
+    .DateRangeSliderMode {
+      flex-direction: row;
+
+      .DateRangeSliderModeOption {
+        margin: 0 20px;
+      }
+    }
+
+    .Slider {
+      margin-top: 30px;
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+}
+
+@media screen and (max-width: 1220px) {
+  .Month,
+  .Year {
+    display: none;
+  }
+}
