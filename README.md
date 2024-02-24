@@ -1,30 +1,57 @@
-# React + TypeScript + Vite
+# Слайдер выбора диапазона дат
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Этот проект представляет собой компонент слайдера для выбора диапазона дат. Пользователи могут использовать его для
+выбора начальной и конечной даты.
 
-Currently, two official plugins are available:
+## Установка
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. Клонируйте репозиторий:
 
-## Expanding the ESLint configuration
+   ```
+   git clone 
+   ```
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+2. Перейдите в директорию проекта:
 
-- Configure the top-level `parserOptions` property like this:
+   ```
+   cd date-range-slider
+   ```
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
+3. Установите зависимости:
+
+   ```
+   npm i
+   ```
+   ```
+   yarn
+   ```
+
+## Использование
+
+Перейдите в App.tsx и измените параметры min и max, передаваемые в ```DateRangeSlider```:
+
+```jsx
+import React from 'react';
+import DateRangeSlider from './DateRangeSlider';
+
+function App() {
+  return (
+    <div style={{ padding: "20px" }}>
+      <DateRangeSlider min={moment()} max={moment().add(3, "y")} />
+    </div>
+  );
 }
+
+export default App;
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Команды
+
+Вы можете использовать следующие команды:
+
+- `npm dev`: Запуск приложения в режиме разработки.
+
+## Структура проекта
+
+- `src/`: Исходный код React-приложения.
+- `public/`: Статические ресурсы.
